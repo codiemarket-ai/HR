@@ -1,0 +1,91 @@
+/**
+ * IPPS - Integrated Personnel & Payroll System (Egypt)
+ * Main Server File
+ */
+
+const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
+
+// استيراد إعدادات قاعدة البيانات والمسارات
+const connectDB = require('./config/db');
+const employeeRoutes = require('./routes/employeeRoutes');
+const taskRoutes = require('./routes/taskRoutes');
+const payrollRoutes = require('./routes/payrollRoutes');
+const salfahRoutes = require('./routes/salfahRoutes');
+const performanceRoutes = require('./routes/performanceRoutes');
+
+// 1. إعدادات البيئة والاتصال
+dotenv.config();
+connectDB(); // الاتصال بـ MongoDB
+
+const app = express();
+
+// 2. الميدلوير (Middleware) - الأمان ومعالجة البيانات
+app.use(helmet()); // حماية الرأس (Headers)
+app.use(cors());   // السماح بالاتصال من الـ Frontend (Next.js)
+app.use(express.json()); // قراءة بيانات الـ JSON
+
+// 3. إعدادات توثيق API (Swagger)
+const swaggerOptions = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'IPPS Egypt HR & Payroll API',
+            version: '1.0.0',
+            description: 'النظام المتكامل لإدارة الأفراد والرواتب وفقاً للقانون المصري',
+            contact: {
+                name: "Backend Support",
+                url: "https://codiemarket.com/qc"
+            }
+        },
+        servers: [
+            {
+                url: `http://localhost:${process.env.PORT || 5000}`,
+                description: 'Development Server'
+            }
+        ],
+    },
+    // تحديد أماكن ملفات المسارات ليتم قراءة الـ Swagger Comments منها
+    apis: ['./routes/*.js'], 
+};
+
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+// 4. تسجيل المسارات (API Endpoints)
+app.use('/api/employees', employeeRoutes);     // إدارة الموظفين
+app.use('/api/tasks', taskRoutes);             // التكليفات والمهام
+app.use('/api/payroll', payrollRoutes);         // محرك الرواتب والضرائب
+app.use('/api/salfah', salfahRoutes);           // السلف والقروض
+app.use('/api/performance', performanceRoutes); // تقييم الأداء والـ KPIs
+
+// 5. مسار فحص الحالة (Health Check)
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'UP', environment: process.env.NODE_ENV || 'development' });
+});
+
+// 6. معالجة الأخطاء العامة (Global Error Handler)
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({
+        success: false,
+        message: "حدث خطأ داخلي في الخادم",
+        error: process.env.NODE_ENV === 'development' ? err.message : {}
+    });
+});
+
+// 7. تشغيل السيرفر
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`
+    ====================================================
+    🚀 IPPS Server is running on port: ${PORT}
+    📖 Swagger Docs: http://localhost:${PORT}/api-docs
+    ✅ MongoDB: Connected
+    ====================================================
+    `);
+});
