@@ -41,7 +41,12 @@ app.use(helmet({
         },
     },
 })); // حماية الرأس (Headers) مع السماح بـ Swagger UI CDN
-app.use(cors());   // السماح بالاتصال من الـ Frontend (Next.js)
+app.use(cors({
+    origin: ['http://localhost:3000', 'http://localhost:3001', 'https://hr-two-jade.vercel.app'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'role'],
+    credentials: true
+}));   // السماح بالاتصال من الـ Frontend (Next.js)
 app.use(express.json()); // قراءة بيانات الـ JSON
 
 // 3. إعدادات توثيق API (Swagger)
