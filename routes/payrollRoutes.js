@@ -43,7 +43,7 @@ const { calculateMonthlyPayroll, deletePayroll, getPayrollSlips } = require('../
  *       200:
  *         description: تم حساب الراتب بنجاح
  */
-router.post('/calculate', authorize(['HR', 'Finance']), calculateMonthlyPayroll);
+router.post('/calculate', authorize(['Admin', 'HR', 'Finance']), calculateMonthlyPayroll);
 
 /**
  * @swagger
@@ -68,7 +68,7 @@ router.post('/calculate', authorize(['HR', 'Finance']), calculateMonthlyPayroll)
  *       200:
  *         description: قائمة الرواتب
  */
-router.get('/', authorize(['HR', 'Finance', 'Manager']), getPayrollSlips);
+router.get('/', authorize(['Admin', 'HR', 'Finance', 'Manager']), getPayrollSlips);
 
 /**
  * @swagger
@@ -87,7 +87,7 @@ router.get('/', authorize(['HR', 'Finance', 'Manager']), getPayrollSlips);
  *       200:
  *         description: تم حذف سجل الراتب بنجاح
  */
-router.delete('/:id', authorize(['Manager']), deletePayroll);
+router.delete('/:id', authorize(['Admin', 'Manager']), deletePayroll);
 
 
 module.exports = router;
