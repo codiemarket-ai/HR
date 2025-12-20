@@ -6,11 +6,18 @@ exports.getAutoPerformance = async (req, res) => {
     try {
         const { employeeId, month, year } = req.query;
 
+        // Create date range for the requested month/year
+        const startDate = new Date(parseInt(year), parseInt(month) - 1, 1);
+        const endDate = new Date(parseInt(year), parseInt(month), 0, 23, 59, 59, 999);
+
         // حساب نقاط المهام المنجزة في هذه الفترة
         const tasks = await Task.find({ 
             assignedTo: employeeId, 
-            status: 'Completed' 
-            // يمكن إضافة فلترة بالتاريخ هنا
+            status: 'Completed',
+            completedAt: {
+                $gte: startDate,
+                $lte: endDate
+            }
         });
 
         let taskPoints = 0;
