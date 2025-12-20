@@ -42,7 +42,7 @@ app.use(helmet({
     },
 })); // حماية الرأس (Headers) مع السماح بـ Swagger UI CDN
 app.use(cors({
-    origin: ['http://localhost:3000', 'http://localhost:3001', 'https://hr-front-iota.vercel.app', 'https://hr-two-jade.vercel.app'],
+    origin: ['http://localhost:3000', 'http://localhost:3001', 'https://hr-front-iota.vercel.app', 'https://hr-two-jade.vercel.app', 'https://hr-a76j0j2de-mahmouds-projects-b44fdbbd.vercel.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'role'],
     credentials: true
